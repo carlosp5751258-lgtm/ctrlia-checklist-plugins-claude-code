@@ -17,13 +17,13 @@
   - Why: the "Will install" section of the `/plugin` panel shows that a plugin has a hook, but not what it runs.
   - Step 1 (the order is the one the official docs suggest): in a session, `/plugin`, pick the plugin and read the details panel: commands, agents, skills, hooks and MCP and LSP servers. If it says "Component summary not available for remote plugin", the plugin is downloaded from somewhere else: all the more reason to read the code.
   - Step 2: open **Open homepage** or **View on GitHub** and find the plugin's folder. Read three things: `hooks/hooks.json` (each hook's command), `.mcp.json` (each server's command or URL) and **every** file in `bin/`.
-  - Step 3: clone the repository and run `claude --plugin-dir <folder> plugin details <name>`: it reads the files without opening a session and lists the inventory. We tried it with a test plugin: it showed the skill, the SessionStart hook and the MCP server, **but not the bin/ folder**, so you have to check that one by hand. The repository's `revisar-plugin.sh` script does steps 2 and 3 in one go.
+  - Step 3: clone the repository and run `claude --plugin-dir <folder> plugin details <name>`: it reads the files without opening a session and lists the inventory. We tried it with a test plugin: it showed the skill, the SessionStart hook and the MCP server, **but not the bin/ folder**, so you have to check that one by hand. The repository's `en/revisar-plugin.sh` script does steps 2 and 3 in one go.
   - Step 4: after installing, `claude plugin details <name>` shows the same for the installed copy in `~/.claude/plugins/cache/`.
   - Standalone skills: read the whole `SKILL.md` and any script that comes with it; be wary of a broad `allowed-tools` (`Bash`, `Bash(curl *)`) and of instructions telling Claude to download or run something.
 
 ```bash
 # Review a cloned plugin before installing it (real output, Claude Code 2.1.316)
-git clone https://github.com/<author>/<marketplace>.git /tmp/revisar && cd /tmp/revisar
+git clone https://github.com/<author>/<marketplace>.git /tmp/review && cd /tmp/review
 # 1. What does it run?
 cat <plugin>/hooks/hooks.json <plugin>/.mcp.json 2>/dev/null
 ls -la <plugin>/bin/ 2>/dev/null && head -50 <plugin>/bin/*
@@ -65,7 +65,7 @@ claude --plugin-dir <plugin> plugin details <plugin>
   - Editor extensions: uninstalling doesn't undo what the code already did. In the Cursor case, the extension left scripts and an SSH key that stayed behind: you had to clean up with the scripts in the notice, check `~/.ssh/authorized_keys` and change, from another machine, the credentials the machine could reach (GitHub, cloud, npm, CI).
   - How to check it: after removing something, `claude plugin list` shouldn't show it, `ls ~/.claude/plugins/cache/` shouldn't have its folder and `/hooks` and `/mcp` shouldn't list anything of its own.
 
-What you have installed and where it comes from (the repository includes it as `inventario.sh`, which only reads):
+What you have installed and where it comes from (the repository includes it as `en/inventario.sh`, which only reads):
 
 ```bash
 claude plugin marketplace list          # source of each marketplace
@@ -74,7 +74,7 @@ claude mcp list                         # MCP servers and their status
 code --list-extensions --show-versions | grep -i claude
 cursor --list-extensions --show-versions | grep -i claude   # if you use Cursor
 # Check for the Cursor case (Oct 29, 2026):
-grep -qs svc-telemetry ~/.ssh/authorized_keys && echo "Clave svc-telemetry encontrada" || echo "Sin clave"
+grep -qs svc-telemetry ~/.ssh/authorized_keys && echo "svc-telemetry key found" || echo "No key"
 ```
 
 Removing a plugin completely:
